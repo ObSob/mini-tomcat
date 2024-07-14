@@ -1,12 +1,12 @@
 package core.lifecycle;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Slf4j
+@Log4j2
 public abstract class LifecycleBase implements Lifecycle {
 
     protected volatile LifecycleState state = LifecycleState.NEW;

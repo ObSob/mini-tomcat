@@ -2,12 +2,12 @@ package core;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.Collection;
 import java.util.concurrent.locks.AbstractQueuedLongSynchronizer;
 
-@Slf4j
+@Log4j2
 public class LimitLatch {
 
     private final Sync sync;
@@ -24,7 +24,7 @@ public class LimitLatch {
         return sync.getCount();
     }
 
-    public void countUpOrWait() throws InterruptedException {
+    public void countUpOrAwait() throws InterruptedException {
         sync.acquireSharedInterruptibly(1L);
     }
 
@@ -36,7 +36,7 @@ public class LimitLatch {
     public void releaseAll() {
         this.release = true;
         // 不确定 release 多少
-        this.sync.release(0);
+        this.sync.releaseShared(0);
     }
 
     public void reset() {
@@ -61,7 +61,7 @@ public class LimitLatch {
             long c = getState();
             if (c >= limit)
                 return -1;
-            long next = c - arg;
+            long next = c + arg;
             if (compareAndSetState(c, next))
                 return next;
             return -1;
@@ -70,7 +70,7 @@ public class LimitLatch {
         @Override
         protected boolean tryReleaseShared(long arg) {
             long c = getState();
-            long next = c + 1;
+            long next = c - arg;
             return compareAndSetState(c, next);
         }
 
