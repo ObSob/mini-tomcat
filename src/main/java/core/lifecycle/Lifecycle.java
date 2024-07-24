@@ -43,6 +43,7 @@ public interface Lifecycle {
     String AFTER_STOP_EVENT = "after stop";
     String BEFORE_DESTROY_EVENT = "before destroy";
     String AFTER_DESTROY_EVENT = "after destroy";
+    String PERIODIC_EVENT = "periodic";
 
     void init() throws LifecycleException;
     void start() throws LifecycleException;

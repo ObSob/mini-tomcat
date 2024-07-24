@@ -1,4 +1,4 @@
-package core;
+package core.container;
 
 public interface Container {
 
@@ -6,5 +6,5 @@ public interface Container {
     void setParent(Container parent);
     void addChild(Container child);
     void removeChild(Container child);
-
+    void backgroundProcess();
 }

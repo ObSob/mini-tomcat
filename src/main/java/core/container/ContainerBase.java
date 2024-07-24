@@ -1,4 +1,4 @@
-package core;
+package core.container;
 
 import core.lifecycle.LifecycleBase;
 import lombok.Getter;
@@ -23,6 +23,11 @@ public abstract class ContainerBase extends LifecycleBase implements Container {
     @Override
     public void removeChild(Container child) {
         this.children.remove(child);
+    }
+
+    public void backgroundProcess() {
+        getChildren().forEach(Container::backgroundProcess);
+        fireLifecycleEvent(AFTER_DESTROY_EVENT, null);
     }
 
 }
