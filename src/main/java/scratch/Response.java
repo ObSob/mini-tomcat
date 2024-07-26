@@ -1,5 +1,7 @@
 package scratch;
 
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.ServletResponse;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
@@ -7,11 +9,13 @@ import lombok.extern.log4j.Log4j2;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.Locale;
 
 @Log4j2
-public class HttpResponse {
+public class Response implements ServletResponse {
     private static final String WEB_ROOT = "webapp";
     private static final String HTTP_VERSION = "HTTP/1.1";
     private static final String CONTENT_TYPE_HEADER = "Content-Type: ";
@@ -19,15 +23,15 @@ public class HttpResponse {
 
     @Setter
     @Getter
-    private HttpRequest request;
+    private Request request;
     private final OutputStream output;
 
-    public HttpResponse(OutputStream output) {
+    public Response(OutputStream output) {
         this.output = output;
     }
 
-    public void sendStaticResource(String uri) throws IOException {
-
+    public void sendStaticResource() throws IOException {
+        String uri = request.getUri();
         Path resourcePath = getResourcePath(uri);
         if (isResourcePresent(resourcePath)) {
             byte[] bytes = getResourceBytes(resourcePath);
@@ -94,4 +98,83 @@ public class HttpResponse {
         }
     }
 
+    @Override
+    public String getCharacterEncoding() {
+        return "";
+    }
+
+    @Override
+    public String getContentType() {
+        return "";
+    }
+
+    @Override
+    public ServletOutputStream getOutputStream() throws IOException {
+        return null;
+    }
+
+    @Override
+    public PrintWriter getWriter() throws IOException {
+        return new PrintWriter(output, true);
+    }
+
+    @Override
+    public void setCharacterEncoding(String charset) {
+
+    }
+
+    @Override
+    public void setContentLength(int len) {
+
+    }
+
+    @Override
+    public void setContentLengthLong(long len) {
+
+    }
+
+    @Override
+    public void setContentType(String type) {
+
+    }
+
+    @Override
+    public void setBufferSize(int size) {
+
+    }
+
+    @Override
+    public int getBufferSize() {
+        return 0;
+    }
+
+    @Override
+    public void flushBuffer() throws IOException {
+
+    }
+
+    @Override
+    public void resetBuffer() {
+
+    }
+
+    @Override
+    public boolean isCommitted() {
+        return false;
+    }
+
+    @Override
+    public void reset() {
+
+    }
+
+    @Override
+    public void setLocale(Locale loc) {
+
+    }
+
+    @Override
+    public Locale getLocale() {
+        return null;
+    }
 }

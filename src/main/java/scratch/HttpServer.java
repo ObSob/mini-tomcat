@@ -8,7 +8,7 @@ import java.net.Socket;
 
 @Log4j2
 public class HttpServer {
-    public static final String SHOWDOWN_COMMAND = "/showdown";
+    public static final String SHOWDOWN_COMMAND = "/shutdown";
     private final int port;
     private ServerSocket serverSocket;
     private volatile boolean running;
@@ -47,24 +47,29 @@ public class HttpServer {
 
         try (InputStream is = clientSocket.getInputStream();
              OutputStream os = clientSocket.getOutputStream()) {
-            HttpRequest httpRequest = new HttpRequest(is);
-            httpRequest.parse();
+            Request request = new Request(is);
+            request.parse();
 
-            if (httpRequest.isEmpty()) {
+            if (request.isEmpty()) {
                 log.info("Received empty request from client: {}. Closing connection.", clientInfo);
                 return;
             }
 
-            String uri = httpRequest.getUri();
+            String uri = request.getUri();
             if (uri == null) {
                 log.warn("Received request with null URI from client: {}", clientInfo);
                 return;
             }
             if (uri.equals(SHOWDOWN_COMMAND)) {
                 running = false;
+            } else if (uri.startsWith("/servlet")) {
+                Response response = new Response(os);
+                response.setRequest(request);
+                new ServletProcessor().process(request, response);
             } else {
-                HttpResponse httpResponse = new HttpResponse(os);
-                httpResponse.sendStaticResource(uri);
+                Response response = new Response(os);
+                response.setRequest(request);
+                new StaticResourceProcessor().process(request, response);
             }
         } catch (IOException e) {
             log.error("Error handling client request", e);
