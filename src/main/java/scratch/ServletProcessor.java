@@ -1,6 +1,8 @@
 package scratch;
 
 import jakarta.servlet.Servlet;
+import jakarta.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpServletResponseWrapper;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
@@ -12,8 +14,8 @@ public class ServletProcessor {
 
     private static final String WEB_ROOT = "webapp";
 
-    public void process(Request request, Response response) {
-        String uri = request.getUri();
+    public void process(HttpRequest httpRequest, HttpResponse httpResponse) {
+        String uri = httpRequest.getRequestURI();
         String servletName = uri.substring(uri.lastIndexOf("/") + 1);
         URLClassLoader loader = null;
         try {
@@ -38,12 +40,12 @@ public class ServletProcessor {
         }
 
         Servlet servlet;
-        RequestFacade requestFacade = new RequestFacade(request);
-        ResponseFacade responseFacade = new ResponseFacade(response);
+        HttpServletRequestWrapper requestWrapper = new HttpServletRequestWrapper(httpRequest);
+        HttpServletResponseWrapper responseWrapper = new HttpServletResponseWrapper(httpResponse);
         try {
             assert myClass != null;
             servlet = (Servlet) myClass.getConstructor().newInstance();
-            servlet.service(requestFacade, responseFacade);
+            servlet.service(requestWrapper, responseWrapper);
         } catch (Exception e) {
             log.error(e);
         }

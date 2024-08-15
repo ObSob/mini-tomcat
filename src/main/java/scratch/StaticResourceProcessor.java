@@ -7,9 +7,9 @@ import java.io.IOException;
 @Log4j2
 public class StaticResourceProcessor {
 
-    public void process(Request request, Response response) {
+    public void process(HttpRequest httpRequest, HttpResponse httpResponse) {
         try {
-            response.sendStaticResource();
+            httpResponse.sendStaticResource();
         } catch (IOException e) {
             log.error(e);
         }

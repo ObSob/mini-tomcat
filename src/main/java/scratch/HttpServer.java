@@ -47,15 +47,15 @@ public class HttpServer {
 
         try (InputStream is = clientSocket.getInputStream();
              OutputStream os = clientSocket.getOutputStream()) {
-            Request request = new Request(is);
-            request.parse();
+            HttpRequest httpRequest = new HttpRequest(is);
+            httpRequest.parse();
 
-            if (request.isEmpty()) {
+            if (httpRequest.isEmpty()) {
                 log.info("Received empty request from client: {}. Closing connection.", clientInfo);
                 return;
             }
 
-            String uri = request.getUri();
+            String uri = httpRequest.getRequestURI();
             if (uri == null) {
                 log.warn("Received request with null URI from client: {}", clientInfo);
                 return;
@@ -63,13 +63,13 @@ public class HttpServer {
             if (uri.equals(SHOWDOWN_COMMAND)) {
                 running = false;
             } else if (uri.startsWith("/servlet")) {
-                Response response = new Response(os);
-                response.setRequest(request);
-                new ServletProcessor().process(request, response);
+                HttpResponse httpResponse = new HttpResponse(os);
+                httpResponse.setHttpRequest(httpRequest);
+                new ServletProcessor().process(httpRequest, httpResponse);
             } else {
-                Response response = new Response(os);
-                response.setRequest(request);
-                new StaticResourceProcessor().process(request, response);
+                HttpResponse httpResponse = new HttpResponse(os);
+                httpResponse.setHttpRequest(httpRequest);
+                new StaticResourceProcessor().process(httpRequest, httpResponse);
             }
         } catch (IOException e) {
             log.error("Error handling client request", e);
@@ -82,9 +82,5 @@ public class HttpServer {
         }
     }
 
-    public static void main(String[] args) {
-        HttpServer server = new HttpServer(8080);
-        server.await();
-    }
 }
 
